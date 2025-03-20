@@ -1,11 +1,17 @@
 import { Outlet } from "react-router";
+import Navbar from "../Navbar";
+import { ModeToggle } from "../mode-toggle";
+
 const MainLayout = () => {
   return (
     <>
-      <nav>Navigation</nav>
+      <Navbar />
       <main>
         <Outlet />
       </main>
+      <div className="fixed bottom-1 right-1">
+        <ModeToggle />
+      </div>
     </>
   );
 };

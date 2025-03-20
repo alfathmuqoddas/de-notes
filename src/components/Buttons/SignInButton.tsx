@@ -2,6 +2,15 @@ import { Button } from "../ui/button";
 import { auth } from "../../lib/firebase";
 import { signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import useAuthStore from "@/store/useAuthStore";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function SignInButton() {
   const { user, setUser } = useAuthStore();
@@ -10,7 +19,6 @@ export function SignInButton() {
     try {
       const result = await signInWithPopup(auth, new GoogleAuthProvider());
       if (result.user) {
-        console.log("User signed in");
         setUser(result.user);
       } else {
         console.log("User not signed in");
@@ -38,16 +46,24 @@ export function SignInButton() {
   return (
     <div>
       {user ? (
-        <>
-          <Button variant={"destructive"} size={"lg"} onClick={handleSignOut}>
-            Sign Out
-          </Button>
-          <p>{user?.displayName}</p>
-        </>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar>
+              <AvatarImage src={user?.photoURL || ""} />
+              <AvatarFallback>{user?.displayName}</AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>{user?.displayName}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut}>
+              <span className="text-red-500">Sign Out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : (
-        <Button size={"lg"} onClick={handleSignIn}>
-          Sign In
-        </Button>
+        <Button onClick={handleSignIn}>Sign In</Button>
       )}
     </div>
   );
