@@ -1,37 +1,32 @@
 import { Button } from "../ui/button";
 import { auth } from "../../lib/firebase";
-import { useState, useEffect } from "react";
-import {
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-  onAuthStateChanged,
-  User,
-} from "firebase/auth";
+import { signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
+import useAuthStore from "@/store/useAuthStore";
 
 export function SignInButton() {
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { user, setUser } = useAuthStore();
 
   const handleSignIn = async () => {
-    setLoading(true);
     try {
       const result = await signInWithPopup(auth, new GoogleAuthProvider());
       if (result.user) {
-        console.log("User signed in", result.user);
+        console.log("User signed in");
+        setUser(result.user);
       } else {
-        console.log("No user");
+        console.log("User not signed in");
+        setUser(null);
       }
     } catch (error) {
       console.error(error);
+      setUser(null);
     }
-    setLoading(false);
   };
 
   const handleSignOut = async () => {
     try {
       if (window.confirm("Are you sure you want to sign out?")) {
         await signOut(auth);
+        setUser(null);
       } else {
         return;
       }
@@ -40,28 +35,15 @@ export function SignInButton() {
     }
   };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-        console.log("User is signed in");
-      } else {
-        setUser(null);
-        console.log("User is signed out");
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
   return (
     <div>
       {user ? (
-        <Button variant={"destructive"} size={"lg"} onClick={handleSignOut}>
-          Sign Out
-        </Button>
+        <>
+          <Button variant={"destructive"} size={"lg"} onClick={handleSignOut}>
+            Sign Out
+          </Button>
+          <p>{user?.displayName}</p>
+        </>
       ) : (
         <Button size={"lg"} onClick={handleSignIn}>
           Sign In
