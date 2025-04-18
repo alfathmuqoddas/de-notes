@@ -10,6 +10,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "./firebase";
+import { INote } from "@/types/INotes";
 
 export const getNotes = async (userId: string) => {
   try {
@@ -18,21 +19,9 @@ export const getNotes = async (userId: string) => {
       orderBy("createdAt", "asc")
     );
     const querySnapshot = await getDocs(q);
-    let notes: {
-      id: string;
-      title: string;
-      content: string;
-      createdAt: any;
-      updatedAt: any;
-    }[] = [];
+    let notes: INote[] = [];
     querySnapshot.forEach((doc) => {
-      notes.push({ id: doc.id, ...doc.data() } as {
-        id: string;
-        title: string;
-        content: string;
-        createdAt: any;
-        updatedAt: any;
-      });
+      notes.push({ id: doc.id, ...doc.data() } as INote);
     });
     return notes;
   } catch (error) {
