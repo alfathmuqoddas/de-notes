@@ -2,11 +2,15 @@ import { SignInButton } from "../Buttons/SignInButton";
 
 const Navbar = () => {
   return (
-    <nav className="fixed flex justify-between items-center w-full h-16 px-4 py-2 bg-primary text-primary-foreground">
-      <div className="flex items-center gap-4">
-        <h1 className="text-2xl font-bold">De-Notes</h1>
+    <nav className="p-6 bg-primary">
+      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between flex-wrap">
+        <div className="flex items-center flex-shrink-0 text-white">
+          <span className="text-xl font-bold text-secondary">DE Notes</span>
+        </div>
+        <div className="flex items-center">
+          <SignInButton />
+        </div>
       </div>
-      <SignInButton />
     </nav>
   );
 };

@@ -6,10 +6,10 @@ const MainLayout = () => {
   return (
     <>
       <Navbar />
-      <main className="pt-32">
+      <main className="pt-8 mx-auto max-w-7xl px-4">
         <Outlet />
       </main>
-      <div className="fixed bottom-1 right-1">
+      <div className="fixed bottom-4 right-4">
         <ModeToggle />
       </div>
     </>
