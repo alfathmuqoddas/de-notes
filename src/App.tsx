@@ -17,7 +17,11 @@ const App = () => {
     return <div>Please Login</div>;
   }
 
-  const notes = useGetNotes({ userId: user?.uid }) as INote[];
+  const { notes, loading, error } = useGetNotes({ userId: user?.uid }) as {
+    notes: INote[];
+    loading: boolean;
+    error: any;
+  };
 
   //function to check whete the notes are selected
   const isSelected = (note: INote) => {
@@ -72,6 +76,8 @@ const App = () => {
 
   console.log({ selectedNotes });
 
+  if (error) return <div>Error: {error.message}</div>;
+
   return (
     <main className="p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -94,23 +100,27 @@ const App = () => {
           {editMode ? "Cancel Selection" : "Select Notes"}
         </button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {filteredNotes.map((note) => (
-          <div
-            key={note.id}
-            onClick={() => toggleNoteSelection([note])}
-            className={`p-4 rounded-xl shadow hover:shadow-md hover:cursor-pointer transition-shadow ease-in-out duration-100 flex flex-col gap-4 ${
-              isSelected(note)
-                ? "bg-blue-100 border-blue-500 border-2"
-                : "border border-gray-300"
-            }`}
-          >
-            <div className="font-bold">{note.title}</div>
-            <div className="text-gray-700">{note.content}</div>
-            <p className="text-xs text-gray-500">ID: {note.id}</p>
-          </div>
-        ))}
-      </div>
+      {loading ? (
+        <>Loading...</>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filteredNotes.map((note) => (
+            <div
+              key={note.id}
+              onClick={() => toggleNoteSelection([note])}
+              className={`p-4 rounded-xl shadow hover:shadow-md hover:cursor-pointer transition-shadow ease-in-out duration-100 flex flex-col gap-4 ${
+                isSelected(note)
+                  ? "bg-blue-100 border-blue-500 border-2"
+                  : "border border-gray-300"
+              }`}
+            >
+              <div className="font-bold">{note.title}</div>
+              <div className="text-gray-700">{note.content}</div>
+              <p className="text-xs text-gray-500">ID: {note.id}</p>
+            </div>
+          ))}
+        </div>
+      )}
       {editMode && selectedNotes.length > 0 && (
         <div className="fixed bottom-0 left-0 w-full bg-gray-100 p-4 border-t border-gray-200 flex justify-end gap-4">
           <p className="text-gray-700">{selectedNotes.length} notes selected</p>
