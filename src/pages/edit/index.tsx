@@ -38,7 +38,7 @@ export default function EditNote() {
     }
     setLoading(true);
     try {
-      const updatedNote = await updateNote(userId, noteId, {
+      await updateNote(userId, noteId, {
         title,
         content,
       });

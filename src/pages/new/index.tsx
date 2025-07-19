@@ -9,7 +9,6 @@ export default function NewNote() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -22,7 +21,7 @@ export default function NewNote() {
     setLoading(true);
 
     try {
-      const newNote = await addNote(user?.uid || "", {
+      await addNote(user?.uid || "", {
         title,
         content,
       });
