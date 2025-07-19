@@ -4,10 +4,11 @@ import {
   // where,
   getDocs,
   doc,
-  updateDoc,
-  arrayUnion,
-  getDoc,
+  setDoc,
   orderBy,
+  deleteDoc,
+  addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { INote } from "@/types/INotes";
@@ -30,70 +31,99 @@ export const getNotes = async (userId: string) => {
   }
 };
 
-export const addNotes = async (userId: string, payload: any) => {
+// Writes a new note to Firestore, generating a new ID for it.
+export const addNote = async (
+  userId: string,
+  note: Omit<INote, "id" | "createdAt" | "updatedAt">
+): Promise<string> => {
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
   try {
-    const notesRef = doc(db, "notesByUserId", userId);
-    await updateDoc(notesRef, {
-      notes: arrayUnion(payload),
+    const notesCollectionRef = collection(db, `notesByUserId/${userId}/notes`);
+    const docRef = await addDoc(notesCollectionRef, {
+      ...note,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
-    console.log("Notes added successfully");
+
+    console.log("Note added with ID:", docRef.id);
+    return docRef.id;
   } catch (error) {
-    console.error(error);
+    console.error("Error adding note:", error);
+    throw error;
+  }
+};
+
+// Writes or updates a note in Firestore with a specific note ID.
+export const setNotes = async (
+  userId: string,
+  noteId: string,
+  note: Omit<INote, "id" | "updatedAt">
+): Promise<string> => {
+  if (!userId || !noteId) {
+    throw new Error("User ID and Note ID are required to set a note.");
+  }
+
+  try {
+    const noteDocRef = doc(db, `notesByUserId/${userId}/notes/${noteId}`);
+    await setDoc(
+      noteDocRef,
+      {
+        ...note,
+        createdAt: note.createdAt || serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+    console.log("Note updated successfully!");
+    return noteDocRef.id;
+  } catch (error) {
+    console.error(`Error updating note ${noteId}:`, error);
+    throw error;
   }
 };
 
 export const updateNote = async (
   userId: string,
   noteId: string,
-  updatedNote: any
-) => {
+  updates: Partial<Omit<INote, "id" | "createdAt">>
+): Promise<string> => {
+  if (!userId || !noteId) {
+    throw new Error("User ID and Note ID are required to update a note.");
+  }
   try {
-    const userRef = doc(db, "notesByUserId", userId);
-
-    // Fetch current notes array
-    const userSnap = await getDoc(userRef);
-    if (!userSnap.exists()) {
-      console.error("User document not found!");
-      return;
-    }
-
-    const notes = userSnap.data().notes || [];
-
-    // Find and update the specific note
-    const updatedNotes = notes.map((note: any) =>
-      note.id === noteId ? { ...note, ...updatedNote } : note
+    const noteDocRef = doc(db, `notesByUserId/${userId}/notes/${noteId}`);
+    await setDoc(
+      noteDocRef,
+      {
+        ...updates,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
     );
-
-    // Update Firestore document with new notes array
-    await updateDoc(userRef, { notes: updatedNotes });
-
-    console.log("Note updated successfully!");
+    console.log(`Note ${noteId} updated successfully!`);
+    return noteDocRef.id;
   } catch (error) {
-    console.error("Error updating note:", error);
+    console.error(`Error updating note ${noteId}:`, error);
+    throw error;
   }
 };
 
-export const deleteNote = async (userId: string, noteId: string) => {
+export const deleteNote = async (
+  userId: string,
+  noteId: string
+): Promise<void> => {
+  if (!userId || !noteId) {
+    throw new Error("User ID and Note ID are required to delete a note.");
+  }
   try {
-    const userRef = doc(db, "notesByUserId", userId);
+    const noteDocRef = doc(db, `notesByUserId/${userId}/notes/${noteId}`);
 
-    // Fetch current notes array
-    const userSnap = await getDoc(userRef);
-    if (!userSnap.exists()) {
-      console.error("User document not found!");
-      return;
-    }
-
-    const notes = userSnap.data().notes || [];
-
-    // Find and remove the specific note
-    const updatedNotes = notes.filter((note: any) => note.id !== noteId);
-
-    // Update Firestore document with new notes array
-    await updateDoc(userRef, { notes: updatedNotes });
-
-    console.log("Note deleted successfully!");
+    await deleteDoc(noteDocRef);
+    console.log(`Note ${noteId} successfully deleted.`);
   } catch (error) {
-    console.error("Error deleting note:", error);
+    console.error(`Error deleting note ${noteId}:`, error);
+    throw error;
   }
 };

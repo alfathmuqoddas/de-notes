@@ -1,10 +1,13 @@
-import { StrictMode } from "react";
+import { StrictMode, Suspense, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 import MainLayout from "./components/Layout/MainLayout.tsx";
 import { ThemeProvider } from "./components/theme-provider.tsx";
 import { BrowserRouter, Routes, Route } from "react-router";
+const New = lazy(() => import("./pages/new"));
+const Edit = lazy(() => import("./pages/edit"));
+const Detail = lazy(() => import("./pages/detail"));
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -13,7 +16,30 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route element={<MainLayout />}>
             <Route index element={<App />} />
-            <Route path="/test" element={<>Test</>} />
+            <Route
+              path="/new"
+              element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <New />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/details/:noteId"
+              element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Detail />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/details/:noteId/edit"
+              element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Edit />
+                </Suspense>
+              }
+            />
           </Route>
         </Routes>
       </BrowserRouter>

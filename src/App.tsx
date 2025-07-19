@@ -4,11 +4,16 @@ import { INote } from "./types/INotes";
 import useSearchStore from "./store/useSearchStore";
 import { useMemo } from "react";
 import useDebounce from "./hooks/useDebounce";
+import { useNavigate } from "react-router";
+import { Button } from "./components/ui/button";
+import { Plus } from "lucide-react";
+import { formatRelativeTime } from "./lib/utils";
 
 const App = () => {
   const { user } = useAuthStore();
   const { searchTerm } = useSearchStore();
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const navigate = useNavigate();
 
   const { notes, loading, error } = useGetNotes({
     userId: user?.uid || null,
@@ -27,10 +32,6 @@ const App = () => {
     );
   }, [notes, debouncedSearchTerm]);
 
-  if (!user) {
-    return <div>Please Login</div>;
-  }
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -41,9 +42,15 @@ const App = () => {
     return <div>No notes found</div>;
   }
 
+  const handleNavigate = (noteId: string, title: string, content: string) => {
+    navigate(`/details/${noteId}`, {
+      state: { noteId, title, content },
+    });
+  };
+
   return (
-    <main>
-      <div className="mb-4 flex items-center justify-between">
+    <div className="flex flex-col gap-4">
+      <div className="hidden md:block">
         <p
           className={`font-bold text-gray-700 ${
             !searchTerm ? "invisible" : ""
@@ -53,19 +60,32 @@ const App = () => {
         </p>
       </div>
 
+      <div>
+        <Button onClick={() => navigate("/new")}>
+          <Plus />
+          Create Note
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredNotes.map((note) => (
           <div
             key={note.id}
-            className={`p-4 rounded-xl shadow hover:shadow-md hover:cursor-pointer transition-shadow ease-in-out duration-100 flex flex-col gap-4 border border-gray-300`}
+            onClick={() => handleNavigate(note.id, note.title, note.content)}
+            className={`p-4 rounded-xl shadow hover:shadow-md hover:cursor-pointer transition-shadow ease-in-out duration-100 flex flex-col gap-4 border border-gray-300 dark:bg-gray-800`}
           >
             <div className="font-bold">{note.title}</div>
-            <div className="text-gray-700">{note.content}</div>
-            <p className="text-xs text-gray-500">ID: {note.id}</p>
+            <div className="">{note.content}</div>
+            <div>
+              <p className="text-xs">{formatRelativeTime(note.createdAt)}</p>
+              <p className="text-xs">
+                Updated: {formatRelativeTime(note.updatedAt)}
+              </p>
+            </div>
           </div>
         ))}
       </div>
-    </main>
+    </div>
   );
 };
 

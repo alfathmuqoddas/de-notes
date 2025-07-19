@@ -1,7 +1,9 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface INote {
   id: string;
   title: string;
   content: string;
-  createdAt: { seconds: number; nanoseconds: number };
-  updatedAt: { seconds: number; nanoseconds: number };
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
