@@ -5,7 +5,7 @@ import useSearchStore from "@/store/useSearchStore";
 const Navbar = () => {
   const { setSearchTerm } = useSearchStore();
   return (
-    <nav className="py-4 bg-teal-400 dark:bg-teal-600">
+    <nav className="py-2 bg-teal-400 dark:bg-teal-600">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
         <div className="flex items-center">
           <span className="text-xl font-bold text-primary">DE Notes</span>

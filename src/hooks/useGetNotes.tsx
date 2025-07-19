@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getNotes } from "../lib/firebaseQuery";
 
-const useGetNotes = ({ userId }: { userId: string }) => {
+const useGetNotes = ({ userId }: { userId: string | null }) => {
   const [notes, setNotes] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
@@ -11,6 +11,7 @@ const useGetNotes = ({ userId }: { userId: string }) => {
       setLoading(true);
       setError(null);
       try {
+        if (!userId) return;
         const notes = await getNotes(userId || "");
         console.log(notes);
         setNotes(notes);
