@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Trash, Pencil } from "lucide-react";
 import { deleteNote } from "@/lib/firebaseQuery";
 import useAuthStore from "@/store/useAuthStore";
+import MarkdownView from "@/components/Input/MarkdownView";
 
 export default function DetailNote() {
   const location = useLocation();
@@ -60,7 +61,7 @@ export default function DetailNote() {
       </div>
 
       <h1 className="text-2xl font-bold">{noteTitle}</h1>
-      <p>{noteContent}</p>
+      <MarkdownView content={`${noteContent}`} />
     </div>
   );
 }

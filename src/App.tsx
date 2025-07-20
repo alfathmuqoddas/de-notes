@@ -24,7 +24,7 @@ const App = () => {
   };
 
   const filteredNotes = useMemo(() => {
-    return notes.filter((note) =>
+    return notes?.filter((note) =>
       searchTerm
         ? note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           note.content.toLowerCase().includes(searchTerm.toLowerCase())
@@ -37,10 +37,6 @@ const App = () => {
   }
 
   if (error) return <div>Error: {error.message}</div>;
-
-  if (notes.length === 0) {
-    return <div>No notes found</div>;
-  }
 
   const handleNavigate = (noteId: string, title: string, content: string) => {
     navigate(`/details/${noteId}`, {

@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { addNote } from "@/lib/firebaseQuery";
 import useAuthStore from "@/store/useAuthStore";
 import { useNavigate } from "react-router";
+import MarkdownView from "@/components/Input/MarkdownView";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function NewNote() {
   const [title, setTitle] = useState("");
@@ -39,22 +41,35 @@ export default function NewNote() {
 
   return (
     <>
-      <div className="flex flex-col gap-4">
-        <NotesInput
-          title={title}
-          content={content}
-          onSetTitle={setTitle}
-          onSetContent={setContent}
-        />
-        <div>
-          <Button
-            onClick={() => handleSubmit(title, content)}
-            disabled={loading || title.trim() === "" || content.trim() === ""}
-          >
-            Create Note
-          </Button>
-        </div>
-      </div>
+      <Tabs defaultValue="edit">
+        <TabsList className="mb-4">
+          <TabsTrigger value="preview">Preview</TabsTrigger>
+          <TabsTrigger value="edit">Edit</TabsTrigger>
+        </TabsList>
+        <TabsContent value="preview">
+          <MarkdownView content={`${content}`} />
+        </TabsContent>
+        <TabsContent value="edit">
+          <div className="flex flex-col gap-4">
+            <NotesInput
+              title={title}
+              content={content}
+              onSetTitle={setTitle}
+              onSetContent={setContent}
+            />
+            <div>
+              <Button
+                onClick={() => handleSubmit(title, content)}
+                disabled={
+                  loading || title.trim() === "" || content.trim() === ""
+                }
+              >
+                Create Note
+              </Button>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </>
   );
 }
