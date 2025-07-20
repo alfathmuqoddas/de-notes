@@ -32,6 +32,7 @@ export default function NotesInput({
           placeholder="content"
           value={content}
           onChange={(e) => onSetContent(e.target.value)}
+          className="h-72"
         />
       </div>
     </div>
